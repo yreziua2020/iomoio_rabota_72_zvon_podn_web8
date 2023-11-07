@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<title>ESP Relay</title>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+
+<style type="text/css">
+
+:root{
+	
+	
+}
+
+    body {
+      min-width: 310px;
+    	max-width: 1900px;
+    	height: 1800px;
+     // margin: 0 auto;
+	   margin: 0 ;
+    }
+
+.highcharts-figure,
+.highcharts-data-table table {
+    min-width: 360px;
+    max-width: 800px;
+    margin: 1em auto;
+}
+
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #ebebeb;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+
+.highcharts-data-table td,
+.highcharts-data-table th,
+.highcharts-data-table caption {
+    padding: 0.5em;
+}
+
+.highcharts-data-table thead tr,
+.highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+
+
+
+
+.temr{
+	//display: block;
+	//margin-left: auto;
+   // margin-right: auto
+	//text-align: center;
+}
+/////////////////////////////////////////////////////////////////////
+
+clearfix:after{
+	content: '';
+	display: table;
+	width: 100%;
+	clear: both;
+}
+div{
+	box-sizing: border-box;	/* чтобы при внуреннем отступе не раширялся блок */
+}
+.grup clearfix{
+	width: 100%;
+	hidden:500px;
+}
+.checkbox{
+	display: none;
+}
+.nadpis{
+	margin: 0;
+	text-align: center;
+	font-weight: bold;
+}
+.tex{
+	margin: 0;
+	padding: 0;
+}
+.text{
+	 position: relative; 
+	 padding-left: 60px;
+/* 	 margin-bottom: 20px; */
+	 line-height: 25px;
+	 
+}
+			
+.text::before{		/*вроде фон в начале рисуем псевдо элемент фон*/
+	content: "";
+	display: block;
+	position: absolute;
+	width: 40px;
+	height: 20px;
+	border: 1px solid #000;
+	background-color: rgb(105, 102, 102);	
+	border-radius: 50px;					
+	top: 0px;
+	left: 10px;
+}
+
+.text::after{		/*Затем ресуем кружочек*/
+	content: "";
+	display: block;
+	position: absolute;	
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	/* margin-left: 10px; */
+	top: 2px;
+	left: 13px;
+	background-color: rgb(255, 255, 255);
+ transition: 0.5s;
+}
+
+.checkbox:not(checked) + .relay_off::after{
+	background-color: rgb(200,200,200);			/* rgb(61, 67, 64); rgb(154, 182, 99);*/
+	
+}
+
+.checkbox:checked + .relay_on::after{  /*подсвечиваем кружочек сдвинутей серым когда переключаем вручную выкллючен*/
+	background-color: rgb(61, 67, 64); /*rgb(154, 182, 99);*/
+	left:  30px;
+}
+
+.checkbox:checked + .ping_on::after{		/*если есть пинг то подсвечиваем кружочек зеленым*/
+	background-color: rgb(1, 255, 22);
+	left: 30px;
+}
+
+.checkbox:checked + .ping_off::after{		/*если нет пинга то подсвечиваем кружочек  белым*/
+	background-color: rgb(255, 255, 255);
+	
+}
+
+.grup{
+	margin-top: 20px;
+}
+.blok{
+		width: 200px;
+		float: left;
+		background: rgb(199, 198, 198);
+		margin: 0;
+		margin-left: 10px;
+		padding: 10px;
+}
+
+</style>
+
+</head>
+<body  onload="startt();">
+		<div class="Verh">
+<!--	<span id="temr3" class="temr">?</span> С° - Серверная2 -->
+		<span >Улицы1: 	  <input type="text" name="h" id="temr2"	value="0" size="2">	
+		<span >Улицы1_:<input type="text" name="h" id="temr1"	value="0" size="2">	
+		<span >Улицы2: 	  <input type="text" name="h" id="temr5"	value="0" size="2">	
+		<span >Серверная<input type="text" name="h" id="temr3"	value="0" size="2">	
+		<span >Комната:<input type="text" name="h" id="temr4"	value="0" size="2">	
+		<span >Uptime:    <input type="text" name="h" id="uptime"	value="00" size="2">
+     <!--   <span >Время: 	  <input type="text" name="h" id="TIME"		value="0000" size="8"> -->
+        <span >День: 	  <input type="text"  id="TIMED" size="1">
+		<span >Время: 	  <input type="datetime-local" id="TIMEDD"	value="1999-09-09T09:09:09" step="1" >			
+		
+		<span >IP: 		  <input type="text" name="h" id="ipid"		value="000" size="2"> 
+		</div>
+  <div class="grup clearfix">
+    <div class="blok">
+      <div class="nadpis">
+        <a>Конструктора</a>
+      </div>
+		 <label class="label" >
+        <span class="tex" id="ipN0">001</span>
+        <input  type="checkbox" class="checkbox" id="relay0" onchange="sendbutton(0,this.checked);">
+        <span class="text relay_on" id="devN0" >relay0</span>
+      </label>
+      <br>
+      <label class="label">
+        <span class="tex" id="ipN1">002</span>
+        <input  type="checkbox" class="checkbox" id="relay1" onchange="sendbutton(1,this.checked);">
+        <span class="text relay_on" id="devN1" >relay1</span>
+      </label>
+      <br>
+      <label class="label">
+        <span class="tex" id="ipN2">003</span>
+        <input  type="checkbox" class="checkbox" id="relay2" onchange="sendbutton(2,this.checked);">
+        <span class="text relay_on" id="devN2">relay2</span>
+      </label>
+      <br>
+      <label class="label">
+        <span class="tex" id="ipN3">004</span>
+        <input  type="checkbox" class="checkbox" id="relay3" onchange="sendbutton(3,this.checked);">
+        <span class="text relay_on" id="devN3">relay3</span>
+      </label>
+      <br>
+      <label class="label">
+        <span class="tex" id="ipN4">005</span>
+        <input  type="checkbox" class="checkbox" id="relay4" onchange="sendbutton(4,this.checked);">
+        <span class="text relay_on" id="devN4">relay4</span>
+      </label>
+      <br>
+      <label class="label">
+        <span class="tex" id="ipN5">006</span>
+        <input  type="checkbox" class="checkbox" id="relay5" onchange="sendbutton(5,this.checked);">
+        <span class="text relay_on" id="devN5">relay5</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN6">007</span>
+        <input  type="checkbox" class="checkbox" id="relay6" onchange="sendbutton(6,this.checked);">
+        <span class="text relay_on" id="devN6">relay6</span>
+      </label>
+	   <br>
+      <label class="label">
+        <span class="tex" id="ipN7">008</span>
+        <input  type="checkbox" class="checkbox" id="relay7" onchange="sendbutton(7,this.checked);">
+        <span class="text relay_on" id="devN7">relay7</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN8">009</span>
+        <input  type="checkbox" class="checkbox" id="relay8" onchange="sendbutton(8,this.checked);">
+        <span class="text relay_on" id="devN8">relay8</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN9">010</span>
+        <input  type="checkbox" class="checkbox" id="relay9" onchange="sendbutton(9,this.checked);">
+        <span class="text relay_on" id="devN9">relay9</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN10">011</span>
+        <input  type="checkbox" class="checkbox" id="relay10" onchange="sendbutton(10,this.checked);">
+        <span class="text relay_on" id="devN10">relay10</span>
+      </label>
+ 	  <br>
+     <label class="label">
+        <span class="tex" id="ipN11">012</span>
+        <input  type="checkbox" class="checkbox" id="relay11" onchange="sendbutton(11,this.checked);">
+        <span class="text relay_on" id="devN11">relay11</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN12">013</span>
+        <input  type="checkbox" class="checkbox" id="relay12" onchange="sendbutton(12,this.checked);">
+        <span class="text relay_on" id="devN12">relay12</span>
+      </label>
+
+    </div>
+	<div class="blok">
+      <div class="nadpis">
+        <a>Бухгалтера</a>
+      </div>
+ 
+      <label class="label">
+        <span class="tex" id="ipN13">014</span>
+        <input  type="checkbox" class="checkbox" id="relay13" onchange="sendbutton(13,this.checked);">
+        <span class="text relay_on" id="devN13">relay13</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN14">015</span>
+        <input  type="checkbox" class="checkbox" id="relay14" onchange="sendbutton(14,this.checked);">
+        <span class="text relay_on" id="devN14">relay14</span>
+      </label>
+ 	  <br>
+      <label class="label">
+        <span class="tex" id="ipN15">016</span>
+        <input  type="checkbox" class="checkbox" id="relay15" onchange="sendbutton(15,this.checked);">
+        <span class="text relay_on" id="devN15">relay15</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN16">017</span>
+        <input  type="checkbox" class="checkbox" id="relay16" onchange="sendbutton(16,this.checked);">
+        <span class="text relay_on" id="devN16">relay16</span>
+      </label>
+
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN17">018</span>
+        <input  type="checkbox" class="checkbox" id="relay17" onchange="sendbutton(17,this.checked);">
+        <span class="text relay_on" id="devN17">relay17</span>
+      </label>		  
+  	  <br>
+      <label class="label">
+        <span class="tex" id="ipN18">019</span>
+        <input  type="checkbox" class="checkbox" id="relay18" onchange="sendbutton(18,this.checked);">
+        <span class="text relay_on" id="devN18">relay18</span>
+      </label>		  
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN19">020</span>
+        <input  type="checkbox" class="checkbox" id="relay19" onchange="sendbutton(19,this.checked);">
+        <span class="text relay_on" id="devN19">relay19</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN20">021</span>
+        <input  type="checkbox" class="checkbox" id="relay20" onchange="sendbutton(20,this.checked);">
+        <span class="text relay_on" id="devN20">relay20</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN21">022</span>
+        <input  type="checkbox" class="checkbox" id="relay21" onchange="sendbutton(21,this.checked);">
+        <span class="text relay_on" id="devN21">relay21</span>
+      </label>	
+	  <br>
+     <label class="label">
+        <span class="tex" id="ipN22">023</span>
+        <input  type="checkbox" class="checkbox" id="relay22" onchange="sendbutton(22,this.checked);">
+        <span class="text relay_on" id="devN22">relay22</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN23">024</span>
+        <input  type="checkbox" class="checkbox" id="relay23" onchange="sendbutton(23,this.checked);">
+        <span class="text relay_on" id="devN23">relay23</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN24">025</span>
+        <input  type="checkbox" class="checkbox" id="relay24" onchange="sendbutton(24,this.checked);">
+        <span class="text relay_on" id="devN24">relay24</span>
+      </label>		  
+  	  <br>
+      <label class="label">
+        <span class="tex" id="ipN25">026</span>
+        <input  type="checkbox" class="checkbox" id="relay25" onchange="sendbutton(25,this.checked);">
+        <span class="text relay_on" id="devN25">relay25</span>
+      </label>
+	  
+    </div>
+    <div class="blok">
+      <div class="nadpis">
+        <a>Разное оборудование</a>
+      </div>
+
+      <label class="label">
+        <span class="tex" id="ipN26">027</span>
+        <input  type="checkbox" class="checkbox" id="relay26" onchange="sendbutton(26,this.checked);">
+        <span class="text relay_on" id="devN26">relay26</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN27">028</span>
+        <input  type="checkbox" class="checkbox" id="relay27" onchange="sendbutton(27,this.checked);">
+        <span class="text relay_on" id="devN27">relay27</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN28">029</span>
+        <input  type="checkbox" class="checkbox" id="relay28" onchange="sendbutton(28,this.checked);">
+        <span class="text relay_on" id="devN28">relay28</span>
+      </label>	
+	  	  <br>
+      <label class="label">
+        <span class="tex" id="ipN29">030</span>
+        <input  type="checkbox" class="checkbox" id="relay29" onchange="sendbutton(29,this.checked);">
+        <span class="text relay_on" id="devN29">relay29</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN30">031</span>
+        <input  type="checkbox" class="checkbox" id="relay30" onchange="sendbutton(30,this.checked);">
+        <span class="text relay_on" id="devN30">relay30</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN31">032</span>
+        <input  type="checkbox" class="checkbox" id="relay31" onchange="sendbutton(31,this.checked);">
+        <span class="text relay_on" id="devN31">relay31</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN32">033</span>
+        <input  type="checkbox" class="checkbox" id="relay32" onchange="sendbutton(32,this.checked);">
+        <span class="text relay_on" id="devN32">relay32</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN33">034</span>
+        <input  type="checkbox" class="checkbox" id="relay33" onchange="sendbutton(33,this.checked);">
+        <span class="text relay_on" id="devN33">relay33</span>
+      </label>
+		<br>
+      <label class="label">
+        <span class="tex" id="ipN34">035</span>
+        <input  type="checkbox" class="checkbox" id="relay34" onchange="sendbutton(34,this.checked);">
+        <span class="text relay_on" id="devN34">relay34</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN35">036</span>
+        <input  type="checkbox" class="checkbox" id="relay35" onchange="sendbutton(35,this.checked);">
+        <span class="text relay_on" id="devN35">relay35</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN36">037</span>
+        <input  type="checkbox" class="checkbox" id="relay36" onchange="sendbutton(36,this.checked);">
+        <span class="text relay_on" id="devN36">relay36</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN37">038</span>
+        <input  type="checkbox" class="checkbox" id="relay37" onchange="sendbutton(37,this.checked);">
+        <span class="text relay_on" id="devN37">relay37</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN38">039</span>
+        <input  type="checkbox" class="checkbox" id="relay38" onchange="sendbutton(38,this.checked);">
+        <span class="text relay_on" id="devN38">relay38</span>
+      </label>		
+		
+		
+    </div>
+
+	 <div class="blok">
+      <div class="nadpis">
+        <a>Сервера</a>
+      </div>
+
+      <label class="label">
+        <span class="tex" id="ipN39">040</span>
+        <input  type="checkbox" class="checkbox" id="relay39" onchange="sendbutton(39,this.checked);">
+        <span class="text relay_on" id="devN39">relay39</span>
+      </label>
+	   <br>
+      <label class="label">
+        <span class="tex" id="ipN40">041</span>
+        <input  type="checkbox" class="checkbox" id="relay40" onchange="sendbutton(40,this.checked);">
+        <span class="text relay_on" id="devN40">relay40</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN41">042</span>
+        <input  type="checkbox" class="checkbox" id="relay41" onchange="sendbutton(41,this.checked);">
+        <span class="text relay_on" id="devN41">relay41</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN42">043</span>
+        <input  type="checkbox" class="checkbox" id="relay42" onchange="sendbutton(42,this.checked);">
+        <span class="text relay_on" id="devN42">relay42</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN43">044</span>
+        <input  type="checkbox" class="checkbox" id="relay43" onchange="sendbutton(43,this.checked);">
+        <span class="text relay_on" id="devN43">relay43</span>
+      </label>
+	  <br>
+	  <label class="label">
+        <span class="tex" id="ipN44">045</span>
+        <input  type="checkbox" class="checkbox" id="relay44" onchange="sendbutton(44,this.checked);">
+        <span class="text relay_on" id="devN44">relay44</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN45">046</span>
+        <input  type="checkbox" class="checkbox" id="relay45" onchange="sendbutton(45,this.checked);">
+        <span class="text relay_on" id="devN45">relay45</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN46">047</span>
+        <input  type="checkbox" class="checkbox" id="relay46" onchange="sendbutton(46,this.checked);">
+        <span class="text relay_on" id="devN46">relay46</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN47">048</span>
+        <input  type="checkbox" class="checkbox" id="relay47" onchange="sendbutton(47,this.checked);">
+        <span class="text relay_on" id="devN47">relay47</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN48">049</span>
+        <input  type="checkbox" class="checkbox" id="relay48" onchange="sendbutton(48,this.checked);">
+        <span class="text relay_on" id="devN48">relay48</span>
+      </label>
+	  <br>
+       <label class="label">
+        <span class="tex" id="ipN49">050</span>
+        <input  type="checkbox" class="checkbox" id="relay49" onchange="sendbutton(49,this.checked);">
+        <span class="text relay_on" id="devN49">relay49</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN50">051</span>
+        <input  type="checkbox" class="checkbox" id="relay50" onchange="sendbutton(50,this.checked);">
+        <span class="text relay_on" id="devN50">relay50</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN51">052</span>
+        <input  type="checkbox" class="checkbox" id="relay51" onchange="sendbutton(51,this.checked);">
+        <span class="text relay_on" id="devN51">relay51</span>
+      </label>	  
+  
+  </div>
+
+ <div class="blok">
+      <div class="nadpis">
+		<a>Разное</a>
+	     </div>
+
+      <label class="label">
+        <span class="tex" id="ipN52">053</span>
+        <input  type="checkbox" class="checkbox" id="relay52" onchange="sendbutton(52,this.checked);">
+        <span class="text relay_on" id="devN52">relay52</span>
+      </label>
+	   <br>
+      <label class="label">
+        <span class="tex" id="ipN53">054</span>
+        <input  type="checkbox" class="checkbox" id="relay53" onchange="sendbutton(53,this.checked);">
+        <span class="text relay_on" id="devN53">relay53</span>
+      </label>	
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN54">055</span>
+        <input  type="checkbox" class="checkbox" id="relay54" onchange="sendbutton(54,this.checked);">
+        <span class="text relay_on" id="devN54">relay54</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN55">056</span>
+        <input  type="checkbox" class="checkbox" id="relay55" onchange="sendbutton(55,this.checked);">
+        <span class="text relay_on" id="devN55">relay55</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN56">057</span>
+        <input  type="checkbox" class="checkbox" id="relay56" onchange="sendbutton(56,this.checked);">
+        <span class="text relay_on" id="devN56">relay56</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN57">058</span>
+        <input  type="checkbox" class="checkbox" id="relay57" onchange="sendbutton(57,this.checked);">
+        <span class="text relay_on" id="devN57">relay57</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN58">059</span>
+        <input  type="checkbox" class="checkbox" id="relay58" onchange="sendbutton(58,this.checked);">
+        <span class="text relay_on" id="devN58">relay58</span>
+      </label>
+	  <br>
+      <label class="label">
+        <span class="tex" id="ipN59">060</span>
+        <input  type="checkbox" class="checkbox" id="relay59" onchange="sendbutton(59,this.checked);">
+        <span class="text relay_on" id="devN59">relay59</span>
+      </label>
+	  <br>    
+	
+	
+	<div class="nadpis">
+		<a>Кондиционер</a>
+		<br>
+	 </div>
+       <label class="label">
+         <input  type="checkbox" class="checkbox" id="kond0" onchange="sendKond(0,this.checked);">
+        <span class="text ping_on" >Вкл кондиц</span>
+      </label>	 
+		<br>
+	<label class="label">
+        <input  type="checkbox" class="checkbox" id="kond1" onchange="sendKond(1,this.checked);">
+        <span class="text ping_on" >Вык кондиц</span>
+      </label>	
+	<br>
+     <label class="label">
+        <input  type="checkbox" class="checkbox" id="kond2" onchange="sendKond(2,this.checked);">
+        <span class="text ping_on" >Вкл Вентил</span>
+      </label>	 
+		<br>
+	<label class="label">
+        <input  type="checkbox" class="checkbox" id="kond3" onchange="sendKond(3,this.checked);">
+        <span class="text ping_on" >Выкл Вентил</span>
+      </label>	
+</div>
+   
+	
+</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+<p>
+
+		<div id="chart-temperature" class="container"></div>
+	<!--	<div id="chart-humidity" class="container"></div>-->
+<!--<input type="button" value="Reboot!" onclick="if (confirm('Are you sure to reboot?')) location.href='/reboot'" />-->
+
+</body>
+<script type="text/javascript">
+var kolKom; //Количество компов
+var PredIp;	//предыдущий ip для подсветки пингуещего свича
+var t1,t2,t3,t4, clok;// глобальные переменные для графиков
+var	tem_zap; //температура заполнения
+var	vrem_zap; //время за полнения
+
+function startt(){
+var request1 = new XMLHttpRequest();
+request1.open('GET', '/start', true);
+request1.onreadystatechange = function() {
+	if (request1.readyState == 4) {
+	var myObj = JSON.parse(request1.responseText);
+	kolKom=myObj.web_ip.length;
+	for (var i = 0; i < myObj.web_ip.length; i++) {document.getElementById('ipN'+i).innerHTML = myObj.web_ip[i];	}
+	for (var i = 0; i < myObj.deviceName.length; i++) {document.getElementById('devN'+i).innerHTML = myObj.deviceName[i];	}
+	}
+}
+
+request1.send(null);
+}
+
+
+
+
+function sendbutton(Pin,Znach){
+server ="/switch?id="+Pin+"&on="+Znach;
+request = new XMLHttpRequest();
+request.open("GET", server, true);
+request.send();
+};
+
+function sendKond(Pin,Znach){
+server ="/kond?id="+Pin+"&on="+Znach;
+request = new XMLHttpRequest();
+request.open("GET", server, true);
+request.send();
+};
+
+/*
+var xmlHttp=createXmlHttpObject();
+function createXmlHttpObject(){
+ if(window.XMLHttpRequest){
+    xmlHttp=new XMLHttpRequest();
+ }else{
+    xmlHttp=new ActiveXObject('Microsoft.XMLHTTP');
+ }
+ return xmlHttp;
+};
+*/
+
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Highcharts.setOptions({    time: {		timezone: 'Europe/Kiev'  },		
+						    global: {        useUTC: false    }				//чтобы время выводилось не в UTC, а в локальном времени пользователя.	
+					});
+//Диаграмма функции инициализации, где контейнер представляет собой контейнер диаграммы DIV 
+var chartT1 = new Highcharts.Chart({
+  chart:{ 
+	height: 500,
+	renderTo : 'chart-temperature', // DIV контейнер в который будет встраиваться график
+	zoomType: 'x',					// разрешаем зумировать по оси X
+	backgroundColor: '#f9f9f9' // Сделаем слегка серый фон
+  },
+
+  
+  title: { text: 'Температура каждую минуту' },
+
+ // subtitle: { text: 'Серверной' },
+  series: [{
+    //showInLegend: false,
+	name: 'Комната 1',
+	color: '#80FF80',
+	marker: {  symbol: 'square'  },
+    data: []
+  }, 
+  {
+	name: 'Улица',
+	color: '#00B0FF',
+	marker: {    symbol: 'diamond'   },
+	data2: []
+  }, 
+  {
+	name: 'Серверная',
+	color: '#FF8000',
+	marker: {    symbol: 'diamond'   },
+	data3: []
+  } , 
+  {
+	name: 'Комната 2',	color: '#ff0000',	marker: {    symbol: 'diamond'   },	data4: []
+  }, 
+  {
+	name: 'Улица2',	color: '#00B0FE',	marker: {    symbol: 'diamond'   },	data5: []
+  }
+  
+  ],
+
+  
+  plotOptions: {
+    line: { animation: false,
+      dataLabels: { enabled: true }
+    },
+	/*series: { color: '#059e8a' }*/
+  },
+
+  xAxis: { type: 'datetime',
+	dateTimeLabelFormats: {  hour: '%H:%M'}
+	,
+	  /*label: { format: '{value:%Y-%b-%e %l:%M %p }' }*/
+	  
+	  		'dateTimeLabelFormats': {
+			'day': '%m/%d',
+			'week': '%m/%d',
+			'month': '%y/%m'
+		}
+	  
+	  
+	//tickPixelInterval: 50
+  },
+  yAxis: {
+    title: { text: 'Температура' },
+    labels: { formatter: function () {    return this.value + '°C';  }}
+  },
+   tooltip: {		//всплывающей подсказкой 
+		yDecimals: 0,
+        xDateFormat: '%H:%M   %d-%m', 	////xDateFormat: '%H:%M %d.%m',		//xDateFormat: '%H:%S %d-%m-%Y',     xDateFormat: '%d.%m.%Y %H:%M', // Наш формат даты
+            // Тут немного увеличиваем размер даты
+		headerFormat: '<span style="font-size: 12px">{point.key}</span><br/>',
+			// Формат надписей в подсказке, названия цветом графика, а значения жирным
+		pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+		shared: true
+    },
+
+  legend: {
+		enabled: true,
+	/*	layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'*/
+	    layout: 'horizontal',
+        align: 'center',
+        verticalAlign: 'bottom'
+	/*	layout: 'vertical',
+        align: 'left',
+        verticalAlign: 'top',
+        x: 150,
+        y: 60,
+        floating: true,
+        borderWidth: 1,
+        backgroundColor: '#FFFFFF'*/
+  },
+  credits: { enabled: false },
+  responsive: {
+        rules: [{
+            condition: {
+                maxWidth: 500
+            },
+            chartOptions: {
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom'
+                }
+            }
+        }]
+    }
+  
+});
+
+
+function refreshData() {
+var request = new XMLHttpRequest();
+request.open('GET', '/data', true);			//сдсь только конфигурируем запрос
+request.onreadystatechange = function() {
+	if (request.readyState == 4) {
+	var data = JSON.parse(request.responseText);
+	var elemen ;
+	t1=data.temp[0];	t2=data.temp[1];	t3=data.temp[2];	t4=data.temp[3]; t5=data.temp[4];
+	document.getElementById('temr1').value = t1;
+	document.getElementById('temr2').value = t2;
+	document.getElementById('temr3').value = t3;
+	document.getElementById('temr4').value = t4;
+	document.getElementById('temr5').value = t5;
+	document.getElementById('uptime').value = data.uptime;
+	clok=data.time;
+	//document.getElementById('TIME').value = clok;
+	message=data.ip;
+	document.getElementById('ipid').value = message;
+	
+	clok=clok - 2*3600;	//уменьшаем часовой пояс от правельного и получаем то что нада на графике
+	clok=clok*1000;	//переводим в мс 
+    var ttt = new Date(clok);
+    var h=ttt.getHours();    var m=ttt.getMinutes();	var s=ttt.getSeconds();	var g=ttt.getFullYear();	var mec=ttt.getMonth()+1;	var chi=ttt.getDate();	var day=ttt.getDay();
+		
+	s = (s == 0) ?  s+=1 : s ; //почемуто когда ноль выдает ошибку
+	h = (h < 10) ? '0' + h : h;
+    m = (m < 10) ? '0' + m : m;
+	s = (s < 10) ? '0' + s : s;
+    mec = (mec < 10) ? '0' + mec : mec;
+    chi = (chi < 10) ? '0' + chi : chi;
+	var hm= h+":"+m+":"+s;
+	var hmg= g+"-"+mec+"-"+chi+"T"+h+":"+m+":"+s;
+   // console.log(hmg);
+	document.getElementById('TIMED').value = day;
+	document.getElementById('TIMEDD').value = hmg;
+	
+//-----------------------------------------------------------------
+	if(PredIp!=null) { 
+		for (var i = 0; i < kolKom; i++) {
+			var ip = document.getElementById('ipN'+i);
+			if(PredIp==ip.innerHTML) {	
+			ip.style.background =  "rgb(199, 198, 198)";
+			}
+	    } 
+    }  
+		for (var i = 0; i < kolKom; i++) {
+			var ip = document.getElementById('ipN'+i);
+			if(message==ip.innerHTML) {PredIp=message; ip.style.background = "rgb(255, 204, 0)";}
+		}
+
+
+//--------------------------------------------------------------------------	
+	for (var i = 0; i < data.ping.length; i++) {	
+		document.getElementById('relay'+i).checked = data.ping[i];
+		elemen = document.getElementById('devN'+i);
+		
+			if 	(data.ping[i]==true) { elemen.classList.remove('ping_off'); elemen.classList.add('ping_on');} 
+			else {elemen.classList.remove('ping_on');elemen.classList.add('relay_off');}
+
+		}
+		for (var i = 0; i < data.relay.length; i++) {
+		var elem = document.getElementById('relay'+i)
+			elem.checked = data.relay[i]; /* переключаем сам чекет по состоянию из масива реле*/
+	
+		}
+
+	document.getElementById('kond0').checked = data.konde[0];
+	document.getElementById('kond1').checked = data.konde[1];
+	document.getElementById('kond2').checked = data.konde[2];
+	document.getElementById('kond3').checked = data.konde[3];
+	
+	}	//if (request.readyState == 4) 
+
+}		//request.onreadystatechange = function
+request.send(null);
+};
+
+setInterval(refreshData, 1000);
+//--------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+   if (this.readyState == 4 && this.status == 200) {
+      var x = (new Date()).getTime();
+	 // var x1 = new Date();
+		
+
+//	  console.log(x);
+		//document.getElementById('TIMED').value = clok;
+	  var  y1 =t1;
+	  var  y2 =t2;
+  	  var  y3 =t3;
+	  var  y4 =t4;
+	  var  y5 =t5;
+      //console.log(this.responseText);
+	  //console.log(y1);console.log(y2);
+	  //y2++;
+	  //y3=y3+2;
+	  //seriesOptions[i].data.push([(info.data[j][0] + 4404683) * 300000, info.data[j][i+1]]);
+		if(chartT1.series[0].data.length > 180) {
+		chartT1.series[0].addPoint([clok, y1], true, true, true);
+		} else {
+        chartT1.series[0].addPoint([clok, y1], true, false, true);
+		}
+
+		if(chartT1.series[1].data.length > 180) {
+		chartT1.series[1].addPoint([clok, y2], true, true, true);
+		} else {
+        chartT1.series[1].addPoint([clok, y2], true, false, true);
+		}
+
+		if(chartT1.series[2].data.length > 180) {
+		chartT1.series[2].addPoint([clok, y3], true, true, true);
+		} else {
+        chartT1.series[2].addPoint([clok, y3], true, false, true);
+		}
+
+		if(chartT1.series[3].data.length > 180) {
+		chartT1.series[3].addPoint([clok, y4], true, true, true);
+		} else {
+        chartT1.series[3].addPoint([clok, y4], true, false, true);
+		}
+		
+		if(chartT1.series[4].data.length > 180) {
+		chartT1.series[4].addPoint([clok, y5], true, true, true);
+		} else {
+        chartT1.series[4].addPoint([clok, y5], true, false, true);
+		}
+     }		//if
+  };
+  xhttp.open("GET", "/data", true);
+  xhttp.send();
+}, 60000 ) ;
+
+
+
+
+var chartT2 = new Highcharts.Chart({
+  chart:{ renderTo:'chart-humidity', 
+  	zoomType: 'x',					// разрешаем зумировать по оси X
+	backgroundColor: '#f9f9f9' // Сделаем слегка серый фон
+  },
+  title: { text: 'Температура каждые пол часа' },
+   series: [{
+    //showInLegend: false,
+	name: 'Комната 1',	color: '#80FF80',	marker: {  symbol: 'square'  },    data_: []
+  }, 
+  {
+	name: 'Улица',	color: '#00B0FF',	marker: {    symbol: 'diamond'   },	data2_: []
+  }, 
+  {
+	name: 'Серверная',	color: '#FF8000',	marker: {    symbol: 'diamond'   },	data3_: []
+  }  , 
+  {
+	name: 'Комната 2',	color: '#ff0000',	marker: {    symbol: 'diamond'   },	data4_: []
+  }
+  ],
+  plotOptions: {
+    line: { animation: false,    dataLabels: { enabled: true }    }
+  },
+  xAxis: {
+    type: 'datetime',
+    /*dateTimeLabelFormats: { second: '%H:%M:%S' }*/
+  },
+  yAxis: {
+    title: { text: 'Температура' }
+  },
+  tooltip: {		//всплывающей подсказкой 
+		yDecimals: 0,
+        xDateFormat: '%H:%M   %d-%m', 	////xDateFormat: '%H:%M %d.%m',		//xDateFormat: '%H:%S %d-%m-%Y',     xDateFormat: '%d.%m.%Y %H:%M', // Наш формат даты
+            // Тут немного увеличиваем размер даты
+		headerFormat: '<span style="font-size: 12px">{point.key}</span><br/>',
+			// Формат надписей в подсказке, названия цветом графика, а значения жирным
+		pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b><br/>',
+		shared: true
+    },
+  credits: { enabled: false }
+});
+setInterval(function ( ) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      //var x = (new Date()).getTime();
+	  //var  y = parseFloat(this.responseText);
+	  var data = JSON.parse(xhttp.responseText);
+	//	var x =clok;
+		//var x =1;
+	  var  y1 =data.temp[0];
+	  var  y2 =data.temp[1];
+  	  var  y3 =data.temp[2];
+	  var  y4 =data.temp[3];
+      //console.log(this.responseText);
+	 console.log(data);
+	 // y2++;
+	  //y3=y3+2;
+   if(chartT2.series[0].data.length > 100) {
+		chartT2.series[0].addPoint([clok, y1], true, true, true);
+      } else {
+        chartT2.series[0].addPoint([clok, y1], true, false, true);
+      }
+   if(chartT2.series[1].data.length > 100) {
+		chartT2.series[1].addPoint([clok, y2], true, true, true);
+      } else {
+        chartT2.series[1].addPoint([clok, y2], true, false, true);
+      }
+/*
+   if(chartT2.series[2].data.length > 100) {
+		chartT2.series[2].addPoint([clok, y3], true, true, true);
+      } else {
+        chartT2.series[2].addPoint([clok, y3], true, false, true);
+      }
+*/
+	if(chartT2.series[3].data.length > 100) {
+		chartT2.series[3].addPoint([clok, y4], true, true, true);
+      } else {
+        chartT2.series[3].addPoint([clok, y4], true, false, true);
+      }
+
+	  
+    }
+  };
+  xhttp.open("GET", "/data", true);
+  xhttp.send();
+}, 1800000 ) ;
+		
+		
+		
+	
+
+	//	document.addEventListener('DOMContentLoaded', startt);	//после загрузки страницы вызывем функцию
+</script>
+</html>
