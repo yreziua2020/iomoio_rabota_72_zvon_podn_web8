@@ -348,13 +348,15 @@ void loop() {
  // visov (1,2);  
      static unsigned long t_clkok = millis()  ; //обновляем время 
       String whiteListPhones = "+380660507748, +380672045106"; // Белый список телефонов
-      if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS("+380672045106", "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
-      if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand("ATD+380672045106;", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
+      //if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS("+380672045106", "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
+      if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS("+380660507748", "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
+      if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand("ATD+380660507748;", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
+      //if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand("ATD+380672045106;", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
 
      if ((h==8)&& (m==7)) { 
         if (!f_send_sms_time){
             f_send_sms_time=1;
-            sendSMS("+380672045106", "Clock=" +String(h)+":"+String(m)+"\nUlic="+String(TempDs18[1].tDs)+"\nUlic_="+String(TempDs18[0].tDs) +"\nUlic="+String(TempDs18[4].tDs) +"\nServ="+String(TempDs18[2].tDs) +"\nKomn="+String(TempDs18[3].tDs) ); 
+            sendSMS("+380660507748", "Clock=" +String(h)+":"+String(m)+"\nUlic="+String(TempDs18[1].tDs)+"\nUlic_="+String(TempDs18[0].tDs) +"\nUlic="+String(TempDs18[4].tDs) +"\nServ="+String(TempDs18[2].tDs) +"\nKomn="+String(TempDs18[3].tDs) ); 
         }
 
       } else { f_send_sms_time=0;}  
@@ -362,7 +364,7 @@ void loop() {
   if (TempDs18[2].tDs>24&&TempDs18[2].tDs!=85) { 
     if (!f_send_sms_temper)
       { f_send_sms_temper=1; 
-      sendSMS("+380672045106", "Warning\nServ="+String(TempDs18[2].tDs));
+      sendSMS("+380660507748", "Warning\nServ="+String(TempDs18[2].tDs));
       }
 
   } else  if (TempDs18[2].tDs<21) {f_send_sms_temper=0;}
