@@ -7,6 +7,12 @@ const byte doma=1;  //кагого устройства дома если 0 то
 
 const byte _debag=1, _debag2=0, _Dping=0, _Dclock=0,  _D18b20=0;  ///выводиться информация в ком порт //////////////////////////////////////////////////////////////////////////////////////
 const byte  _Dwifi=0,  _com_tel=0, _com_sql=0 ;  ///выводиться информация в ком порт ///////
+#define Nom_MTS //есл определена (не закоментированна то тогда используем номер мтс)
+#ifdef Nom_MTS 
+const  String nomer_с ="+380660507748" ;
+#else 
+const  String nomer_с ="+380660507748" ;
+#endif
 // Идентификатор устройства (если используется несколько)
 #ifdef _ip_adr 
 const short UserID=1;
@@ -349,14 +355,14 @@ void loop() {
      static unsigned long t_clkok = millis()  ; //обновляем время 
       String whiteListPhones = "+380660507748, +380672045106"; // Белый список телефонов
       //if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS("+380672045106", "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
-      if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS("+380660507748", "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
-      if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand("ATD+380660507748;", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
+      if (digitalRead(14)==0) {if (f_pina_energy==0) {f_pina_energy=1; sendSMS(nomer_с, "220 ok");   if (_com_sql) {Serial.println("отправляю  SMS");} }  }    //есть електричество
+      if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand(nomer_с+";", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
       //if (digitalRead(14)==1) {if (f_pina_energy==1) {f_pina_energy=0;  sendATCommand("ATD+380672045106;", true);  if (_com_sql) {Serial.println("звоню");}  }  }   //нет елетричества
 
      if ((h==8)&& (m==7)) { 
         if (!f_send_sms_time){
             f_send_sms_time=1;
-            sendSMS("+380660507748", "Clock=" +String(h)+":"+String(m)+"\nUlic="+String(TempDs18[1].tDs)+"\nUlic_="+String(TempDs18[0].tDs) +"\nUlic="+String(TempDs18[4].tDs) +"\nServ="+String(TempDs18[2].tDs) +"\nKomn="+String(TempDs18[3].tDs) ); 
+            sendSMS(nomer_с, "Clock=" +String(h)+":"+String(m)+"\nUlic="+String(TempDs18[1].tDs)+"\nUlic_="+String(TempDs18[0].tDs) +"\nUlic="+String(TempDs18[4].tDs) +"\nServ="+String(TempDs18[2].tDs) +"\nKomn="+String(TempDs18[3].tDs) ); 
         }
 
       } else { f_send_sms_time=0;}  
@@ -364,7 +370,7 @@ void loop() {
   if (TempDs18[2].tDs>24&&TempDs18[2].tDs!=85) { 
     if (!f_send_sms_temper)
       { f_send_sms_temper=1; 
-      sendSMS("+380660507748", "Warning\nServ="+String(TempDs18[2].tDs));
+      sendSMS(nomer_с, "Warning\nServ="+String(TempDs18[2].tDs));
       }
 
   } else  if (TempDs18[2].tDs<21) {f_send_sms_temper=0;}
@@ -393,7 +399,8 @@ void loop() {
 
 
      if (SIM800.available())   { 
-    _response = waitResponse();_response.trim();  //ечли что пришло то читаем значениея через фукцию ожидания ответа
+    _response = waitResponse(); //ечли что пришло то читаем значениея через фукцию ожидания ответа
+    _response.trim();  
      if (_com_tel) {Serial.println(_response);}                  
      // проверяем начинается ли строка на RING в стоке _response  
      if (_response.startsWith("RING")) { int phoneindex = _response.indexOf("+CLIP: \"");//ищим  +CLIP: " в _response если находим то возращаем идекс найденого или иначе -1 если найдена то phoneindex>-1
